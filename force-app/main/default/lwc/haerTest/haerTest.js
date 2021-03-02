@@ -231,12 +231,81 @@ var Player = (function () {
 
     // Erzeugt ein Material mit einer Textur, die einen Text enthält
     function createNumberMaterial(number, numberTextureUrl) {
-        console.log(numberTextureUrl);
-        var texture = new THREE.TextureLoader().load(numberTextureUrl);
+        console.log(number, numberTextureUrl);
+
+
+        const bitmap = document.createElement('canvas');
+        bitmap.width = 128;
+        bitmap.height = 128;
+        const context = bitmap.getContext('2d');
+        context.fillStyle = '#000000';
+        context.fillRect(0, 0, 128, 128);
+        context.fillStyle = '#eeeeee';
+        context.fillRect(1, 1, 126, 126);
+        context.font = 'Bold 64px sans-serif';
+        context.textAlign = 'center';
+        context.textBaseline = 'middle';
+        context.fillStyle = '#444444';
+        context.fillText(number, 64, 64);
+
+        const dataUrl = bitmap.toDataURL();
+        console.log(dataUrl);
+
+        /*
+
+        var texture = new THREE.Texture();
         console.log(texture);
+        const image = new Image();
+        image.onload = function () {
+            console.log(this, image);
+            texture.image = image;
+            texture.needsUpdate = true;
+        };
+        image.src = numberTextureUrl;
         texture.magFilter = THREE.NearestFilter;
         texture.minFilter = THREE.LinearMipMapLinearFilter;
-        return new THREE.MeshLambertMaterial({ map: texture });
+        */
+
+        /*
+        const image = new Image(); // or document.createElement('img' );
+        // Create texture
+        var texture = new THREE.Texture(image);
+        // On image load, update texture
+        image.onload = () =>  {
+            texture.magFilter = THREE.NearestFilter;
+            texture.minFilter = THREE.LinearMipMapLinearFilter;
+            texture.needsUpdate = true;
+        };
+        // Set image source
+        image.src = dataUrl;
+        */
+
+       const width = 512;
+       const height = 512;
+       
+       const size = width * height;
+       const data = new Uint8Array( 3 * size );
+       const color = new THREE.Color( 0xffffff );
+       
+       const r = Math.floor( color.r * 255 );
+       const g = Math.floor( color.g * 255 );
+       const b = Math.floor( color.b * 255 );
+       
+       for ( let i = 0; i < size; i ++ ) {
+       
+           const stride = i * 3;
+       
+           data[ stride ] = r;
+           data[ stride + 1 ] = g;
+           data[ stride + 2 ] = b;
+       
+       }
+       
+       // used the buffer to create a DataTexture
+       
+       const texture = new THREE.DataTexture( data, width, height, THREE.RGBFormat );
+        
+        return new THREE.MeshBasicMaterial({ map: texture });
     }
 
     // Erstellt eine Liste von ThreeJS Objekten aus der gegebenen Szene
@@ -382,6 +451,10 @@ export default class HaerTest extends LightningElement {
         }).then(() => {
             this.initialize3DView();
         });
+
+        const iframe = this.template.querySelector('iframe');
+        console.log(iframe);
+        iframe.innerHTML = 'Hallo Welt!';
     }
 
     initialize3DView() {
