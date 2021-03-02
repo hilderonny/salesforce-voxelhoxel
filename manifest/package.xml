@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Package xmlns="http://soap.sforce.com/2006/04/metadata">
 	<types>
-		<members>HAER_Voxel_Model__c.HAER_Data_File_Id__c</members>
-		<members>HAER_Voxel_Model__c.HAER_Thumbnail_File_Id__c</members>
+		<members>HAER_Voxel_Model__c.HAER_Data__c</members>
+		<members>HAER_Voxel_Model__c.HAER_Thumbnail__c</members>
 		<name>CustomField</name>
 	</types>
 	<types>

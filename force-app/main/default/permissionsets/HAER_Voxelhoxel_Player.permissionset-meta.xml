@@ -3,12 +3,12 @@
     <description>Can play Voxelhoxel models</description>
     <fieldPermissions>
         <editable>false</editable>
-        <field>HAER_Voxel_Model__c.HAER_Data_File_Id__c</field>
+        <field>HAER_Voxel_Model__c.HAER_Data__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
-        <field>HAER_Voxel_Model__c.HAER_Thumbnail_File_Id__c</field>
+        <field>HAER_Voxel_Model__c.HAER_Thumbnail__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <hasActivationRequired>false</hasActivationRequired>
