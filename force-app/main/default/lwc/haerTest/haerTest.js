@@ -60,7 +60,7 @@ var Player = (function () {
         },
 
         // Bereinigt die Szene und lädt das angegebene Modell
-        loadModel: function (model) {
+        loadModel: function (model, numberTextureUrl) {
             // Szene bereinigen und alle alten Objekte entfernen
             if (objects) {
                 objects.forEach(function (obj) {
@@ -70,7 +70,7 @@ var Player = (function () {
             objects = []; // Einfach leer machen
             raycastablePlanes = [];
             // Materialien vorbereiten
-            createMaterials(model.colorpalette);
+            createMaterials(model.colorpalette, numberTextureUrl);
             // Würfel erstellen
             var boxes = createBoxesForModel(model);
             // Würfel in Objektliste speichern und der Szene hinzufügen
@@ -152,7 +152,7 @@ var Player = (function () {
             controls.enabled = true; // Nicht erst bei Bewegung, sonst hat man Sprünge in der Bewegung
         }
         // Maus bewegen
-        renderer.domElement.addEventListener('mousemove', function () {
+        renderer.domElement.addEventListener('mousemove', function (event) {
             event.preventDefault();
             // Wenn man das Modell weder dreht noch gerade malt, dann soll nix weiter gemacht werden
             if (isMoving && !isPainting) return;
@@ -166,7 +166,7 @@ var Player = (function () {
         }, false);
         renderer.domElement.addEventListener('mouseup', function () { handleUp(); }, false);
         renderer.domElement.addEventListener('touchend', function () { handleUp(); }, false);
-        renderer.domElement.addEventListener('mousedown', function () {
+        renderer.domElement.addEventListener('mousedown', function (event) {
             event.preventDefault();
             mousePosition.set(
                 (event.offsetX / renderer.domElement.parentNode.clientWidth) * 2 - 1,
@@ -174,13 +174,13 @@ var Player = (function () {
             );
             handleDown();
         }, false);
-        renderer.domElement.addEventListener('touchstart', function () {
+        renderer.domElement.addEventListener('touchstart', function (event) {
             var x = event.changedTouches[0].clientX - event.target.offsetParent.offsetLeft;
             var y = event.changedTouches[0].clientY - event.target.offsetParent.offsetTop;
             mousePosition.set((x / renderer.domElement.parentNode.clientWidth) * 2 - 1, -(y / renderer.domElement.parentNode.clientHeight) * 2 + 1);
             handleDown();
         }, false);
-        renderer.domElement.addEventListener('touchmove', function () {
+        renderer.domElement.addEventListener('touchmove', function (event) {
             if (!isPainting) return;
             var x = event.changedTouches[0].clientX - event.target.offsetParent.offsetLeft;
             var y = event.changedTouches[0].clientY - event.target.offsetParent.offsetTop;
@@ -203,7 +203,7 @@ var Player = (function () {
     }
 
     // Bereitet anhand der Palette die Standard- und Platzhaltermatierialien vor
-    function createMaterials(palette) {
+    function createMaterials(palette, numberTextureUrl) {
         // Erst mal leer machen
         standardMaterials = [];
         numberMaterials = [];
@@ -211,7 +211,7 @@ var Player = (function () {
             // Standardmaterial erzeugen
             standardMaterials[index] = createStandardMaterial(paletteEntry);
             // Platzhaltermaterial erzeugen
-            numberMaterials[index] = createNumberMaterial(index + 1);
+            numberMaterials[index] = createNumberMaterial(index + 1, numberTextureUrl);
         });
     }
 
@@ -230,22 +230,12 @@ var Player = (function () {
     }
 
     // Erzeugt ein Material mit einer Textur, die einen Text enthält
-    function createNumberMaterial(number) {
-        const bitmap = document.createElement('canvas');
-        bitmap.width = 128;
-        bitmap.height = 128;
-        const context = bitmap.getContext('2d');
-        context.fillStyle = '#000000';
-        context.fillRect(0, 0, 128, 128);
-        context.fillStyle = '#eeeeee';
-        context.fillRect(1, 1, 126, 126);
-        context.font = 'Bold 64px sans-serif';
-        context.textAlign = 'center';
-        context.textBaseline = 'middle';
-        context.fillStyle = '#444444';
-        context.fillText(number, 64, 64);
-        const texture = new THREE.Texture(bitmap);
-        texture.needsUpdate = true;
+    function createNumberMaterial(number, numberTextureUrl) {
+        console.log(numberTextureUrl);
+        var texture = new THREE.TextureLoader().load(numberTextureUrl);
+        console.log(texture);
+        texture.magFilter = THREE.NearestFilter;
+        texture.minFilter = THREE.LinearMipMapLinearFilter;
         return new THREE.MeshLambertMaterial({ map: texture });
     }
 
@@ -268,7 +258,9 @@ var Player = (function () {
                     // Würfel erzeugen, dabei die angrenzenden Würfel beachten, damit nur die sichtbaren Flächen erzeugt werden
                     var box = createPlayBox(
                         // Da gibt es ein Problem mit dem Erzeugen der Nummern-Materialien. Vermutlich kann man im ShadowDOM nicht so einfach einen canvas temporär erstellen.
-                        standardMaterials[paletteIndex],//isPainted ? standardMaterials[paletteIndex] : numberMaterials[paletteIndex],
+                        // Offscreencanvas wird nicht unterstützt: https://developer.salesforce.com/docs/component-library/tools/locker-service-viewer
+                        //standardMaterials[paletteIndex],
+                        isPainted ? standardMaterials[paletteIndex] : numberMaterials[paletteIndex],
                         x,
                         y,
                         z,
@@ -379,6 +371,8 @@ export default class HaerTest extends LightningElement {
 
     isInitialized = false;
 
+    textureUrl = VOXELHOXEL_LIB + '/numbertexture.jpg';
+
     renderedCallback() {
         if (this.isInitialized) return;
         this.isInitialized = true;
@@ -394,6 +388,6 @@ export default class HaerTest extends LightningElement {
         const modelContainer = this.template.querySelector('.modelContainer');
         Player.init(modelContainer);
         console.log(this.data);
-        Player.loadModel(JSON.parse(this.data));
+        Player.loadModel(JSON.parse(this.data), this.textureUrl);
     }
 }
