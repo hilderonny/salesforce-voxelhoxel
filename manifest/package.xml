@@ -18,5 +18,9 @@
 		<members>HAER_Voxelhoxel_Player</members>
 		<name>PermissionSet</name>
 	</types>
+	<types>
+		<members>HAER_voxelhoxel</members>
+		<name>StaticResource</name>
+	</types>
 	<version>50.0</version>
 </Package>
