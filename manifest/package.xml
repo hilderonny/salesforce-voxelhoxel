@@ -13,5 +13,10 @@
 		<members>HAER_Voxel_Model__c-Voxel Model Layout</members>
 		<name>Layout</name>
 	</types>
+	<types>
+		<members>HAER_Voxelhoxel_Creator</members>
+		<members>HAER_Voxelhoxel_Player</members>
+		<name>PermissionSet</name>
+	</types>
 	<version>50.0</version>
 </Package>
